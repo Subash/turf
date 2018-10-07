@@ -1,5 +1,5 @@
 {
-  "name": "turf",
+  "name": "turf-html",
   "version": "0.0.1",
   "description": "HTML macros with Kit support",
   "main": "lib/turf.js",
