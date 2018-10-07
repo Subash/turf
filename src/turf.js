@@ -17,7 +17,7 @@ class Compiler {
   }
 
   findPosition({ data, keyword, startPosition, endPosition }) {
-    endPosition = endPosition || data.length;
+    if(!Number.isInteger(endPosition)) endPosition = data.length;
     data = data.substring(0, endPosition);
     let keywordPosition = data.indexOf(keyword, startPosition);
     if(keywordPosition === -1) return;
