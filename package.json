@@ -8,7 +8,7 @@
     "build": "npm run clean-lib && npm run compile-src",
     "compile-src": "babel src --out-dir lib",
     "clean-lib": "rm -r ./lib || true",
-    "prepublish": "npm run build && npm run test"
+    "prepare": "npm run build && npm run test"
   },
   "jest": {
     "modulePathIgnorePatterns": [
