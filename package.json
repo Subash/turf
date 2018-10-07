@@ -1,0 +1,53 @@
+{
+  "name": "turf",
+  "version": "0.0.1",
+  "description": "HTML macros with Kit support",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "npm run build && jest",
+    "build": "npm run clean-lib && npm run compile-src",
+    "compile-src": "babel src --out-dir lib",
+    "clean-lib": "rm -r ./lib || true"
+  },
+  "jest": {
+    "modulePathIgnorePatterns": [
+      "fixtures"
+    ]
+  },
+  "babel": {
+    "plugins": [
+      "syntax-class-properties",
+      "syntax-object-rest-spread",
+      "transform-class-properties",
+      "transform-es2015-modules-commonjs",
+      "transform-object-rest-spread"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Subash/turf.git"
+  },
+  "keywords": [
+    "kit",
+    "html",
+    "turf"
+  ],
+  "author": "Subash Pathak",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Subash/turf/issues"
+  },
+  "homepage": "https://github.com/Subash/turf#readme",
+  "dependencies": {
+    "fs-extra": "^7.0.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-plugin-syntax-class-properties": "^6.13.0",
+    "babel-plugin-syntax-object-rest-spread": "^6.13.0",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.2",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "jest": "^23.6.0"
+  }
+}
