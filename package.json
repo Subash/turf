@@ -2,7 +2,7 @@
   "name": "turf",
   "version": "0.0.1",
   "description": "HTML macros with Kit support",
-  "main": "lib/index.js",
+  "main": "lib/turf.js",
   "scripts": {
     "test": "npm run build && jest",
     "build": "npm run clean-lib && npm run compile-src",
