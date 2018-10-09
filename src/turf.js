@@ -5,7 +5,7 @@ class Compiler {
   static COMMENT_START = '<!--';
   static COMMENT_END = '-->';
   static NEW_LINE = '\n';
-  static extensions = [ '.kit', '.turf' ];
+  static extensions = [ '.kit', '.turf', '.html', '.htm'];
 
   constructor(options) {
     this.variables = options.variables || {};
