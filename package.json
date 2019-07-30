@@ -26,7 +26,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Subash/turf.git"
+    "url": "git+https://github.com/Subash/turf-html.git"
   },
   "keywords": [
     "kit",
@@ -36,9 +36,9 @@
   "author": "Subash Pathak",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Subash/turf/issues"
+    "url": "https://github.com/Subash/turf-html/issues"
   },
-  "homepage": "https://github.com/Subash/turf#readme",
+  "homepage": "https://github.com/Subash/turf-html#readme",
   "dependencies": {
     "fs-extra": "^7.0.0"
   },
