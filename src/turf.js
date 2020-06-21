@@ -28,27 +28,27 @@ class Compiler {
   }
 
   /**
-   * Split data into blocks of data and comments
+   * split data into blocks of data and comments
    */
   findBlocks(data) {
-    let startPosition = 0; // Start from the beginning of the string
+    let startPosition = 0; // start from the beginning of the string
     let blocks = [];
-  
+
     while(startPosition < data.length) {
       const commentStart = this.findPosition({ data, keyword: Compiler.COMMENT_START, startPosition });
 
-      //If there are no comments
+      // if there are no comments
       if(!commentStart) {
         let newLine = this.findPosition({ data, keyword: Compiler.NEW_LINE, startPosition });
-        //If there is a new line keep the data until the new line and move on otherwise keep the rest of the data
+        // if there is a new line keep the data until the new line and move on otherwise keep the rest of the data
         const endPosition = newLine ? newLine.end: data.length;
         blocks.push({ start: startPosition, end: endPosition, data: data.substring(startPosition, endPosition) });
         startPosition = endPosition;
         continue;
       }
-      
+
       let commentEnd = this.findPosition({ data, keyword: Compiler.COMMENT_END, startPosition: commentStart.end });
-      //Comments must have an end
+      // comments must have an end
       if(!commentEnd) {
         const err = new Error('Invalid comment. Comment not closed.');
         const { line, column } = this.getLineColumnFromPosition(data, commentStart.start);
@@ -58,64 +58,64 @@ class Compiler {
         throw err;
       }
 
-      //Check if there is any new line before the comment
+      // check if there is any new line before the comment
       let newLine = this.findPosition({ data, keyword: Compiler.NEW_LINE, startPosition: startPosition, endPosition: commentStart.start });
-      //if there is a new line before the comment keep the data until the new line and continue to the next line
+      // if there is a new line before the comment keep the data until the new line and continue to the next line
       if(newLine) {
         blocks.push({ start: startPosition, end: newLine.end, data: data.substring(startPosition, newLine.end) });
         startPosition = newLine.end;
         continue;
       }
 
-      //Keep the data before the comment block
+      // keep the data before the comment block
       blocks.push({ start: startPosition, end: commentStart.start, data: data.substring(startPosition, commentStart.start) });
-      //Keep the data inside the comment block
+      // keep the data inside the comment block
       blocks.push({ start: commentStart.start, end: commentEnd.end, data: data.substring(commentStart.start, commentEnd.end) });
 
-      //Move on to the end of the comment
+      // move on to the end of the comment
       startPosition = commentEnd.end;
     }
-  
+
     return blocks;
   }
 
   isComment(string) {
     return string.startsWith(Compiler.COMMENT_START);
   }
-  
+
   getCommentContent(comment) {
-    return comment.substring(Compiler.COMMENT_START.length, comment.length - Compiler.COMMENT_END.length).trim(); // Remove starting and closing whitespace
+    return comment.substring(Compiler.COMMENT_START.length, comment.length - Compiler.COMMENT_END.length).trim(); // remove starting and closing whitespace
   }
-  
+
   isSpecialComment(string) {
     if(!this.isComment(string)) return false;
     const content = this.getCommentContent(string);
     return ['@', '$'].some( keyword => content.startsWith(keyword));
   }
-  
+
   isInclude(content) {
     return ['@include', '@import'].some( keyword => content.startsWith(keyword));
   }
 
   /**
-   * Variables can be declared in multiple ways
+   * variables can be declared in multiple ways
    * $variable = value
    * $variable : value
    * $variable value
-   * Also @ character can be used instead of the $
+   * also @ character can be used instead of the $
    */
   parseVariable(content) {
     let [ variable, ...value ] = content.split(/(\s|=|:)/);
-    
-    // Join the rest of the content together then remove opening/closing whitespace
+
+    // join the rest of the content together then remove opening/closing whitespace
     value = value.join('').trim();
 
-    // Remove the assignment operator such as = and : from the beginning of the value
+    // remove the assignment operator such as = and : from the beginning of the value
     if(['=', ':'].some( operator => value.startsWith(operator))) {
-      value = value.substring(1).trim() // Take the rest of the string except the first character then remove the opening/closing whitespace
+      value = value.substring(1).trim() // take the rest of the string except the first character then remove the opening/closing whitespace
     }
 
-    // Remove the declaration operator such as @ or $ from the variable
+    // remove the declaration operator such as @ or $ from the variable
     variable = variable.substring(1);
 
     return {
@@ -124,10 +124,9 @@ class Compiler {
   }
 
   isVariableInitialization(content) {
-    const { variable, value } = this.parseVariable(content);
-    return !!value; // Variable is initialized when a value is set
+    return !!this.parseVariable(content).value; // variable is initialized when a value is set
   }
-  
+
   isVariableUse(content) {
     return !this.isVariableInitialization(content);
   }
@@ -143,39 +142,40 @@ class Compiler {
   getVariable(variable) {
     let optional = variable.endsWith('?');
     if(optional) {
-      // Remove the question mark if the variable is optional
-      variable = variable.substring(0, variable.length - 1);
+      variable = variable.substring(0, variable.length - 1); // remove the question mark if the variable is optional
     }
+
     if(!(variable in this.variables) && !optional) {
       throw new Error(`Invalid variable. Use ${variable}? for optional variable`);
     }
+
     return this.variables[variable] || '';
   }
 
   /**
-   * Resolve possible includes
+   * resolve possible includes
    * eg: @import file can mean
    * file.kit, _file.kit or just file or _file
    */
 
   async resolvePossibleIncludes(include) {
-    // Find file path
-    // Search relative to file dir if the file path is relative
-    // Search relative to root dir if the file path is absolute
+    // find file path
+    // search relative to file dir if the file path is relative
+    // search relative to root dir if the file path is absolute
     let file = path.resolve(this.baseDir, include);
     if(include.startsWith('/')) {
-      // Remove the slash then resolve
+      // remove the slash then resolve
       path.resolve(this.rootDir, include.substring(1));
     }
 
-    // Find the file name and directory
+    // find the file name and directory
     const dir = path.dirname(file);
     const name = path.basename(file);
 
-    // Possible names can be file name or partial
+    // possible names can be file name or partial
     let names = [ name, `_${name}`];
 
-    // Add possible extensions
+    // add possible extensions
     let files = [];
     for(const name of names) {
       files.push(name);
@@ -183,8 +183,8 @@ class Compiler {
         files.push(`${name}${extension}`);
       }
     }
-    
-    // Return full paths
+
+    // return full paths
     return files.map( file => path.join(dir, file));
   }
 
@@ -201,49 +201,51 @@ class Compiler {
     }
 
     if(!file) throw new Error(`Failed to find the included file \`${include}\``);
+
     if(this.parents.includes(file)) {
       throw new Error(`Recursive include detected. \`${path.relative(this.rootDir, this.file)}\` is including parent file ${path.relative(this.rootDir, file)}`);
     }
+
     return file;
   }
 
   async processInclude(content) {
-    // Remove everything before the first space
+    // remove everything before the first space
     // to remove @import or @include statements
     let [ statement, ...includes ] = content.split(' ');
-    includes = includes.join(' '); // Join the remaining parts
+    includes = includes.join(' '); // join the remaining parts
 
-    // Split the comma separated lists
+    // split the comma separated lists
     includes = includes.split(',').map( include => include.trim());
 
-    // Remove quotes
+    // remove quotes
     includes = includes.map( include => include.replace(/('|")/g, ''));
 
-    // Resolve actual paths
+    // resolve actual paths
     const includedPaths = [];
     for(const include of includes) {
       includedPaths.push(await this.resolveInclude(include));
     }
 
-    // Load included content
+    // load included content
     const includedContent = [];
     for(const includedPath of includedPaths) {
-      // Also allow @import-base64
+      // also allow @import-base64
       const base64 = statement.includes('base64');
       includedContent.push(await this.includeFile(includedPath, { base64 }));
     }
 
-    // Join and return included content
+    // join and return included content
     return includedContent.join('\n');
   }
 
   async includeFile(file, { base64 = false } = {}) {
     const data = await fs.readFile(file);
 
-    //Return the base64 encoded string for @import-base64
+    // return the base64 encoded string for @import-base64
     if(base64) return data.toString('base64');
-    
-    // Do not process files with different extensions
+
+    // do not process files with different extensions
     if(!Compiler.extensions.includes(path.extname(file))) return data.toString('utf-8');
 
     const fileOptions = {
@@ -284,7 +286,7 @@ class Compiler {
     const blocks = this.findBlocks(this.data);
     const chunks = [];
     for(const [index, block] of blocks.entries()) {
-      // If data on this block is empty; 
+      // if data on this block is empty
       // check if previous or next block is a variable declaration and remove it to remove the whitespace around variable declarations
       if(!block.data.trim()) {
         const previousBlock = blocks[index-1];
