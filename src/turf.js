@@ -133,7 +133,7 @@ class Compiler {
 
   setVariable(variable, value) {
     if(value === 'nil') {
-      delete this.variables[variable];
+      this.variables[variable] = '';
     } else {
       this.variables[variable] = value;
     }
