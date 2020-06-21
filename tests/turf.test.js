@@ -1,14 +1,14 @@
-import compile from '../lib/turf';
-import fs from 'fs-extra';
-import path from 'path';
+const compile = require('../src/turf');
+const fs  = require('fs');
+const path  = require('path');
 
 async function infoFromName(fileName) {
   const input = path.resolve(__dirname, 'fixtures/input', fileName)
   const output = path.resolve(__dirname, 'fixtures/output', fileName.replace(path.extname(fileName), '.html'))
   return {
-    input, output, 
-    inputData: await fs.readFile(input, 'utf-8'),
-    outputData: await fs.readFile(output, 'utf-8')
+    input, output,
+    inputData: await fs.promises.readFile(input, 'utf-8'),
+    outputData: await fs.promises.readFile(output, 'utf-8')
   };
 }
 

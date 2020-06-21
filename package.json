@@ -2,26 +2,13 @@
   "name": "turf-html",
   "version": "0.0.3",
   "description": "HTML macros with Kit support",
-  "main": "lib/turf.js",
+  "main": "src/turf.js",
   "scripts": {
-    "test": "npm run build && jest",
-    "build": "npm run clean-lib && npm run compile-src",
-    "compile-src": "babel src --out-dir lib",
-    "clean-lib": "rm -r ./lib || true",
-    "prepare": "npm run build && npm run test"
+    "test": "jest"
   },
   "jest": {
     "modulePathIgnorePatterns": [
       "fixtures"
-    ]
-  },
-  "babel": {
-    "plugins": [
-      "syntax-class-properties",
-      "syntax-object-rest-spread",
-      "transform-class-properties",
-      "transform-es2015-modules-commonjs",
-      "transform-object-rest-spread"
     ]
   },
   "repository": {
@@ -39,16 +26,7 @@
     "url": "https://github.com/Subash/turf-html/issues"
   },
   "homepage": "https://github.com/Subash/turf-html#readme",
-  "dependencies": {
-    "fs-extra": "^7.0.0"
-  },
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-plugin-syntax-class-properties": "^6.13.0",
-    "babel-plugin-syntax-object-rest-spread": "^6.13.0",
-    "babel-plugin-transform-class-properties": "^6.24.1",
-    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.2",
-    "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "jest": "^23.6.0"
+    "jest": "^26.0.1"
   }
 }

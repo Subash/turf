@@ -1,5 +1,5 @@
-import fs from 'fs-extra';
-import path from 'path';
+const fs = require('fs');
+const path = require('path');
 
 class Compiler {
   static COMMENT_START = '<!--';
@@ -23,7 +23,7 @@ class Compiler {
     if(keywordPosition === -1) return;
     return {
       start: keywordPosition,
-      end:  keywordPosition + keyword.length //string.indexOf() returns the start position of the keyword so add the length of the keyword to find the end position
+      end:  keywordPosition + keyword.length // string.indexOf() returns the start position of the keyword so add the length of the keyword to find the end position
     }
   }
 
@@ -194,7 +194,7 @@ class Compiler {
 
     for(const possiblePath of possiblePaths) {
       try {
-        await fs.access( possiblePath, fs.constants.F_OK);
+        await fs.promises.access( possiblePath, fs.constants.F_OK);
         file = possiblePath;
         break;
       } catch (err) {}
@@ -240,7 +240,7 @@ class Compiler {
   }
 
   async includeFile(file, { base64 = false } = {}) {
-    const data = await fs.readFile(file);
+    const data = await fs.promises.readFile(file);
 
     // return the base64 encoded string for @import-base64
     if(base64) return data.toString('base64');
@@ -323,6 +323,6 @@ class Compiler {
   }
 }
 
-export default async function compile(data, options = {}) {
+module.exports = async function compile(data, options = {}) {
   return await new Compiler({ data, ...options }).compile();
 }
