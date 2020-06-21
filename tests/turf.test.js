@@ -8,7 +8,7 @@ async function infoFromName(fileName) {
   return {
     input, output,
     inputData: await fs.promises.readFile(input, 'utf-8'),
-    outputData: await fs.promises.readFile(output, 'utf-8')
+    outputData: await fs.promises.readFile(output, 'utf-8').catch(()=> {})
   };
 }
 
@@ -16,4 +16,15 @@ test('Test Basic Compilation', async ()=> {
   const file = await infoFromName('basic.kit');
   const result = await compile(file.inputData, { file: file.input });
   expect(result).toBe(file.outputData);
+});
+
+test('Test Basic Compilation', async ()=> {
+  const file = await infoFromName('compile.kit');
+  expect.assertions(2);
+  try {
+    await compile(file.inputData, { file: file.input });
+  } catch (err) {
+    expect(err.message).toContain('@compile is not supported.')
+    expect(err.line).toBe(10);
+  }
 });

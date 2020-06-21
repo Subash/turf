@@ -97,6 +97,10 @@ class Compiler {
     return ['@include', '@import'].some( keyword => content.startsWith(keyword));
   }
 
+  isCompile(content) {
+    return content.startsWith('@compile');
+  }
+
   /**
    * variables can be declared in multiple ways
    * $variable = value
@@ -263,6 +267,8 @@ class Compiler {
     const content = this.getCommentContent(comment);
     if(this.isInclude(content)) {
       return await this.processInclude(content);
+    } if(this.isCompile(content)) {
+      throw new Error(`@compile is not supported. You can however compile the file first then use @include/@import to import the output file.`);
     } else if(this.isVariableInitialization(content)) {
       const { variable, value } = this.parseVariable(content);
       this.setVariable(variable, value);
